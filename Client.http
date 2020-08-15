@@ -1,0 +1,114 @@
+### Require REST Client VSCode Extenction to run
+### https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+
+### Variables
+@url=http://localhost:5000
+@token=token
+
+
+
+### Search Jobs
+GET {{url}}/search/kamarier HTTP/1.1
+
+
+### Register User
+POST {{url}}/auth/register HTTP/1.1
+Content-Type: application/json
+
+{
+    "name":"user",
+    "email":"example@example.com",
+    "password":"12345678",
+    "jobTitle":"xxxx"
+}
+
+
+### Login User
+POST {{url}}/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "email":"example@example.com",
+    "password":"12345678"
+}
+
+
+### Delete User
+DELETE {{url}}/auth/remove HTTP/1.1
+Authorization: Bearer {{token}}
+
+
+### Get User Detail
+GET {{url}}/auth/me HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+### Update User Detail
+PUT {{url}}/auth/update HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name":"user",
+    "email":"user@example.com",
+    "jobTitle":"xxxx"
+}
+
+### Update User Password
+PUT {{url}}/auth/update/password HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "currentPassword":"12345678",
+    "newPassword":"12345678s"
+}
+
+### Get User Jobs
+GET {{url}}/auth/jobs HTTP/1.1
+Authorization: Bearer {{token}}
+
+
+### Bookmark Job
+POST {{url}}/auth/bookmark HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "title": "xxxxx",
+    "link": "https://www.njoftimefalas.com/23/oferta-njoftime-pune/id-xxxxx"
+}
+
+
+### Get Bookmark
+GET {{url}}/auth/bookmark HTTP/1.1
+Authorization: Bearer {{token}}
+
+
+### Check if Job is Bookmarked
+POST {{url}}/auth/bookmark/check HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "link":"Job Link"
+}
+
+
+### Forgot Password
+POST {{url}}/auth/forgotpassword HTTP/1.1
+Content-Type: application/json
+
+{
+    "email":"user@example.com"
+}
+
+### Reset Password
+PUT {{url}}/auth/resetpassword/:resetToken HTTP/1.1
+Content-Type: application/json
+
+{
+    "password":"123456789"
+}
+
