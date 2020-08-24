@@ -84,7 +84,7 @@ exports.getUserDetail = async (req, res, next) => {
 // @access    Private
 exports.updateUserDetail = async (req, res, next) => {
   try {
-    const { name, email, jobTitle, sendEmail } = req.body;
+    const { name, email, jobTitle, jobCity, jobType, sendEmail } = req.body;
 
     const user = await User.findByIdAndUpdate(
       req.user.id,
@@ -92,6 +92,8 @@ exports.updateUserDetail = async (req, res, next) => {
         name,
         email,
         jobTitle,
+        jobCity,
+        jobType,
         sendEmail,
       },
       { runValidators: true, new: true }
@@ -141,23 +143,28 @@ exports.updateUserPassword = async (req, res, next) => {
 exports.getUserJobs = async (req, res, next) => {
   try {
     const query = req.user.jobTitle;
+    const city = req.user.jobCity;
+    const type = req.user.jobType;
     let data;
 
     const jobs = await JobCategory.findOne({
       $text: { $search: query },
+      jobCity: city,
+      jobType: type,
     });
 
     if (!jobs) {
-      data = await getJobs(query);
+      data = await getJobs(query, city, type);
 
       await JobCategory.create({
         name: query,
         jobs: data,
+        city,
         count: [data.length],
       });
     } else {
       if (jobs.jobs.length === 0) {
-        data = await getJobs(query);
+        data = await getJobs(query, city, type);
 
         await JobCategory.findByIdAndUpdate(jobs._id, {
           jobs: data,
@@ -424,7 +431,7 @@ exports.forgotPassword = async (req, res, next) => {
       email,
       subject: "Forgot Password Token",
       text: `
-      ${process.env.CLIENT_URL}/resetpassword/${resetToken}
+      ${process.env.CLIENT_URL}resetpassword/${resetToken}
       Click The Link Up to Reset Password
       `,
     });

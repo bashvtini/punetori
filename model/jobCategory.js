@@ -5,6 +5,10 @@ const JobCategory = new mongoose.Schema({
     type: String,
     required: [true, "Please provide a job category name"],
   },
+  city: {
+    type: String,
+    required: [true, "Please provide a job city"],
+  },
   jobs: Array,
   count: [Number],
 });

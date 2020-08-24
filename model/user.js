@@ -3,6 +3,33 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
+const availableCity = [
+  "tirane",
+  "durres",
+  "elbasan",
+  "fier",
+  "gjirokaster",
+  "kavaje",
+  "korce",
+  "kruje",
+  "kukes",
+  "lezhe",
+  "lushnje",
+  "permet",
+  "peshkopi",
+  "pogradec",
+  "puke",
+  "sarande",
+  "shkoder",
+  "skrapar",
+  "tepelene",
+  "tirane",
+  "tropoje",
+  "vlore",
+];
+
+const availableType = [1, 2, 3];
+
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -30,7 +57,9 @@ const UserSchema = new mongoose.Schema({
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
-  jobTitle: String,
+  jobTitle: Array,
+  jobCity: { type: String, enum: availableCity },
+  jobType: { type: Number, enum: availableType },
   createdAt: {
     type: Date,
     default: Date.now,

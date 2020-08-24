@@ -15,6 +15,6 @@ module.exports = async (options) => {
     to: options.email,
     subject: options.subject,
     text: options.text,
-    // html: options.html,
+    html: options.html,
   });
 };
