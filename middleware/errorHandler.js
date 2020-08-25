@@ -2,7 +2,7 @@ module.exports = (err, req, res, next) => {
   let message = err.message;
   statusCode = err.statusCode;
 
-  // console.log(err);
+  console.log(err);
 
   if (err.name === "CastError") {
     message = "Resource does not exist";

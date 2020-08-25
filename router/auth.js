@@ -15,12 +15,15 @@ const {
   checkBookmarkStatus,
   unBookmarkJob,
   deleteUser,
+  verifyAccount,
 } = require("../controller/auth");
 
 const protect = require("../middleware/protect");
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+
+router.get("/verify/:token", verifyAccount);
 
 router.get("/me", protect, getUserDetail);
 router.put("/update", protect, updateUserDetail);

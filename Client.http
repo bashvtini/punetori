@@ -3,12 +3,12 @@
 
 ### Variables
 @url=http://localhost:5000
-@token=token
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVmNDQwODQ1NzRlMzAyMTc3NDZlZmIzYSIsImlhdCI6MTU5ODI5NDExMCwiZXhwIjoxNjAwODg2MTEwfQ.DFA4BP_Y6kfYmxZNdMUvwZJje_M2QrtuOm4MyZf_97Y
 
 
 
 ### Search Jobs
-GET {{url}}/search/kamarier HTTP/1.1
+GET {{url}}/search/kamarier?city=tirane HTTP/1.1
 
 
 ### Register User
@@ -17,10 +17,13 @@ Content-Type: application/json
 
 {
     "name":"user",
-    "email":"example@example.com",
+    "email":"bashvtini@gmail.com",
     "password":"12345678",
-    "jobTitle":"xxxx"
+    "jobTitle":["kamarier"]
 }
+
+### Verify Account
+GET {{url}}/auth/verify/2e39260d3bee62a0d0fd4ed85e51d2e10dc1ac88 HTTP/1.1
 
 
 ### Login User
@@ -50,9 +53,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "name":"user",
-    "email":"user@example.com",
-    "jobTitle":"xxxx"
+    "verifiedAccount":"bashvtini"
 }
 
 ### Update User Password

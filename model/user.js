@@ -26,9 +26,10 @@ const availableCity = [
   "tirane",
   "tropoje",
   "vlore",
+  "",
 ];
 
-const availableType = [1, 2, 3];
+const availableType = [1, 2, 3, 0];
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -46,7 +47,7 @@ const UserSchema = new mongoose.Schema({
   },
   sendEmail: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   password: {
     type: String,
@@ -55,11 +56,12 @@ const UserSchema = new mongoose.Schema({
     maxlength: 100,
     select: false,
   },
+  jobTitle: String,
+  jobCity: { type: String, enum: availableCity, default: "" },
+  jobType: { type: Number, enum: availableType, default: 0 },
+  verifiedAccountToken: String,
   resetPasswordToken: String,
   resetPasswordExpire: Date,
-  jobTitle: Array,
-  jobCity: { type: String, enum: availableCity },
-  jobType: { type: Number, enum: availableType },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -91,6 +93,17 @@ UserSchema.methods.forgotPassword = function () {
     .update(generatedToken)
     .digest("hex");
   this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+
+  return generatedToken;
+};
+
+UserSchema.methods.verifyAccount = function () {
+  const generatedToken = crypto.randomBytes(20).toString("hex");
+
+  this.verifiedAccountToken = crypto
+    .createHash("sha256")
+    .update(generatedToken)
+    .digest("hex");
 
   return generatedToken;
 };

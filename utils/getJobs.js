@@ -6,7 +6,7 @@ module.exports = async (query, city = "", type = 0) => {
   const data = [
     ...(await njoftimefalas(query, city)),
     ...(await njoftime(query, city, type)),
-    ...(await duapune(query, city, type)),
+    ...(await duapune(query, type)),
   ];
 
   return data;

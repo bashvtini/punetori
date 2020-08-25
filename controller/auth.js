@@ -10,10 +10,83 @@ const getJobs = require("../utils/getJobs");
 // @access    Public
 exports.registerUser = async (req, res, next) => {
   try {
+    delete req.body["verifiedAccountToken"];
+    delete req.body["resetPasswordToken"];
+    delete req.body["resetPasswordExpire"];
+    delete req.body["createdAt"];
+    delete req.body["sendEmail"];
+
+    const exist = await User.findOne(req.body.email);
+
+    if (exist) {
+      return next({
+        message: "User already exists",
+        statusCode: 400,
+      });
+    }
+
     const user = await User.create(req.body);
-    const token = user.getSignedToken();
+
+    const verifyToken = user.verifyAccount();
+    await user.save({ validateBeforeSave: false });
+
+    await sendEmail({
+      email,
+      subject: "Verify Account",
+      text: "Please Verify account by clicking the link bellow",
+      html: `
+      <div style="background-color: #302c45;width: 100%;height: 100%;margin: auto;">
+        <h1 style="color: #0fa645;font-weight: 800;font-family: sans-serif;text-align: center;margin: 0;padding: 10px;">
+          Punetori
+        </h1>
+
+        <div style="padding: 20px 0;margin: auto;color: #afacc3;font-family: sans-serif;background-color: #37334a;text-align: center;">
+          <h2 style="margin: 0;">Verify Account</h2>
+          <a style="background-color: #12ad47;padding: 10px 25px;display: inline-block;border: none;border-radius: 3px;color: #d6ffe8;transition: background-color 0.2s;margin: 20px 0;text-decoration: none;" href="${process.env.CLIENT_URL}verify/${verifyToken}" >
+            Verify
+          </a>
+        </div>
+      </div>
+      `,
+    });
 
     res.status(201).json({
+      success: true,
+      message: "Please check your email address",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc      Verify Account
+// @route     POST /auth/verify/:token
+// @access    Public
+exports.verifyAccount = async (req, res, next) => {
+  try {
+    const verifyToken = crypto
+      .createHash("sha256")
+      .update(req.params.token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      verifiedAccount: verifyToken,
+    });
+
+    if (!user) {
+      return next({
+        message: "Invalid Token",
+        statusCode: 404,
+      });
+    }
+
+    user.verifiedAccountToken = undefined;
+    user.sendEmail = true;
+    await user.save();
+
+    const token = user.getSignedToken();
+
+    res.status(200).json({
       success: true,
       token,
     });
@@ -84,20 +157,16 @@ exports.getUserDetail = async (req, res, next) => {
 // @access    Private
 exports.updateUserDetail = async (req, res, next) => {
   try {
-    const { name, email, jobTitle, jobCity, jobType, sendEmail } = req.body;
+    delete req.body["password"];
+    delete req.body["verifiedAccountToken"];
+    delete req.body["resetPasswordToken"];
+    delete req.body["resetPasswordExpire"];
+    delete req.body["createdAt"];
 
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      {
-        name,
-        email,
-        jobTitle,
-        jobCity,
-        jobType,
-        sendEmail,
-      },
-      { runValidators: true, new: true }
-    );
+    const user = await User.findByIdAndUpdate(req.user.id, req.body, {
+      runValidators: true,
+      new: true,
+    });
 
     res.status(200).json({
       success: true,
@@ -115,7 +184,15 @@ exports.updateUserPassword = async (req, res, next) => {
   try {
     const { currentPassword, newPassword } = req.body;
 
+    if (!currentPassword || !newPassword) {
+      return next({
+        message: "Please provide current password and new password",
+        statusCode: 400,
+      });
+    }
+
     const user = await User.findById(req.user.id).select("+password");
+
     const matchPassword = await user.matchPassword(currentPassword);
 
     if (!matchPassword) {
@@ -130,7 +207,7 @@ exports.updateUserPassword = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      user,
+      message: "Password was updated successfully",
     });
   } catch (error) {
     next(error);
@@ -149,8 +226,8 @@ exports.getUserJobs = async (req, res, next) => {
 
     const jobs = await JobCategory.findOne({
       $text: { $search: query },
-      jobCity: city,
-      jobType: type,
+      city,
+      type,
     });
 
     if (!jobs) {
@@ -160,6 +237,7 @@ exports.getUserJobs = async (req, res, next) => {
         name: query,
         jobs: data,
         city,
+        type,
         count: [data.length],
       });
     } else {

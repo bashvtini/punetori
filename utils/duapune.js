@@ -21,22 +21,17 @@ const typeConverter = (enteredType) => {
   return "";
 };
 
-module.exports = async (query, city = "", type = "") => {
+module.exports = async (query, type = "") => {
   // Get Today's Job Offers from https://duapune.com/
   const jobs = [];
 
   await axios
     .get(
-      `https://duapune.com/search/advanced/filter?keyword=${query}&city=${city}&job_type=${typeConverter(
+      `https://duapune.com/search/advanced/filter?keyword=${query}&job_type=${typeConverter(
         type
       )}`
     )
     .then((result) => {
-      console.log(
-        `https://duapune.com/search/advanced/filter?keyword=${query}&city=${city}&job_type=${typeConverter(
-          type
-        )}`
-      );
       const $ = cheerio.load(result.data);
 
       // Get Jobs
