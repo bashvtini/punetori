@@ -3,7 +3,7 @@ const getJobs = require("../utils/getJobs");
 module.exports = async (req, res, next) => {
   const { query } = req.params;
   const city = req.query.city || "";
-  const type = req.query.type || 0;
+  const type = parseInt(req.query.type, 10) || 0;
 
   if (query === "") {
     next({

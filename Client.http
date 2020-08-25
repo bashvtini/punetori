@@ -3,12 +3,12 @@
 
 ### Variables
 @url=http://localhost:5000
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVmNDQwODQ1NzRlMzAyMTc3NDZlZmIzYSIsImlhdCI6MTU5ODI5NDExMCwiZXhwIjoxNjAwODg2MTEwfQ.DFA4BP_Y6kfYmxZNdMUvwZJje_M2QrtuOm4MyZf_97Y
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVmNDRlNTgxMDM3YTQ4MWQ0MDk5MDJhMiIsImlhdCI6MTU5ODM1MTExNiwiZXhwIjoxNjAwOTQzMTE2fQ.NUU1OUUZzuyxVkQRGwITTJLfYxPeb4S35D3gxZFf3Js
 
 
 
 ### Search Jobs
-GET {{url}}/search/kamarier?city=tirane HTTP/1.1
+GET {{url}}/search/frontend?city=tirane&type=2 HTTP/1.1
 
 
 ### Register User
@@ -19,11 +19,11 @@ Content-Type: application/json
     "name":"user",
     "email":"bashvtini@gmail.com",
     "password":"12345678",
-    "jobTitle":["kamarier"]
+    "jobTitle":"frontend"
 }
 
 ### Verify Account
-GET {{url}}/auth/verify/2e39260d3bee62a0d0fd4ed85e51d2e10dc1ac88 HTTP/1.1
+GET {{url}}/auth/verify/8f9551d611479bd135311e721c8eb12ea3fbb469 HTTP/1.1
 
 
 ### Login User
@@ -31,7 +31,7 @@ POST {{url}}/auth/login HTTP/1.1
 Content-Type: application/json
 
 {
-    "email":"example@example.com",
+    "email":"bashvtini@gmail.com",
     "password":"12345678"
 }
 
@@ -53,7 +53,8 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "verifiedAccount":"bashvtini"
+    "jobCity":"tirane",
+    "jobType":1
 }
 
 ### Update User Password

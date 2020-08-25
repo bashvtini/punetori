@@ -7,9 +7,9 @@ const typeConverter = (enteredType) => {
   }
 
   const typeList = [
-    { city: 1, value: "2" }, // Full time
-    { city: 2, value: "1" }, // Part time
-    { city: 3, value: "4" }, // Intership
+    { name: 1, value: "2" }, // Full time
+    { name: 2, value: "1" }, // Part time
+    { name: 3, value: "4" }, // Intership
   ];
 
   for (const type of typeList) {

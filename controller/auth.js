@@ -15,8 +15,9 @@ exports.registerUser = async (req, res, next) => {
     delete req.body["resetPasswordExpire"];
     delete req.body["createdAt"];
     delete req.body["sendEmail"];
+    const { email } = req.body;
 
-    const exist = await User.findOne(req.body.email);
+    const exist = await User.findOne({ email });
 
     if (exist) {
       return next({
@@ -60,17 +61,17 @@ exports.registerUser = async (req, res, next) => {
 };
 
 // @desc      Verify Account
-// @route     POST /auth/verify/:token
+// @route     GET /auth/verify/:token
 // @access    Public
 exports.verifyAccount = async (req, res, next) => {
   try {
-    const verifyToken = crypto
+    const verifiedAccountToken = crypto
       .createHash("sha256")
       .update(req.params.token)
       .digest("hex");
 
     const user = await User.findOne({
-      verifiedAccount: verifyToken,
+      verifiedAccountToken,
     });
 
     if (!user) {
@@ -91,6 +92,7 @@ exports.verifyAccount = async (req, res, next) => {
       token,
     });
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
@@ -109,7 +111,10 @@ exports.loginUser = async (req, res, next) => {
       });
     }
 
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({
+      email,
+      verifiedAccountToken: undefined,
+    }).select("+password");
 
     if (!user) {
       return next({
