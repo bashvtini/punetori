@@ -4,7 +4,22 @@
 
 <p>The URL</p>
 
-<strong>GET</strong> <http://localhost:5000/search/:query>
+<strong>GET</strong> <http://localhost:5000/search/:query?city=tirane&type=1>
+
+### Query:
+
+<ol>
+<li>City: All Albanian Cities</li>
+<li>Type: 
+    <ul>
+        <li>0 - All Types</li>
+        <li>1 - Full Time</li>
+        <li>2 - Part Time</li>
+        <li>3 - Intership</li>
+    </ul>
+
+</li>
+</ol>
 
 #### Response
 
@@ -43,9 +58,26 @@
     "name":"user",
     "email":"example@example.com",
     "password":"12345678",
-    "jobTitle":"xxxxxxx"
+    "jobTitle":"xxxxxxx",
+    "jobCity":"xxx", // Not required - Default = ""
+    "jobType": 0 // Not required - Default = 0
 }
 ```
+
+#### Response
+
+```javascript
+{
+    "success": true,
+    "message": "Please check your email address"
+}
+```
+
+## Verify User
+
+<p>The URL</p>
+
+<strong>GET</strong> <http://localhost:5000/auth/verify/:token>
 
 #### Response
 

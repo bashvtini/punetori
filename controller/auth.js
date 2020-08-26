@@ -291,6 +291,19 @@ exports.getUserJobs = async (req, res, next) => {
   }
 };
 
+const getJobId = (link) => {
+  if (link.includes("njoftimefalas")) {
+    const newLink = link.split("/");
+    return newLink[newLink.length - 1];
+  }
+  if (link.includes("duapune")) {
+    return link.split("/jobs/")[1];
+  }
+  if (link.includes("njoftime")) {
+    return link.split("showthread.php?")[1];
+  }
+};
+
 // @desc      Bookmark Job
 // @route     POST /auth/bookmark
 // @access    Private
@@ -305,19 +318,7 @@ exports.bookmarkJob = async (req, res, next) => {
       });
     }
 
-    const getJobId = () => {
-      if (link.includes("njoftimefalas.com")) {
-        return link.split("oferta-njoftime-pune/")[1];
-      }
-      if (link.includes("duapune.com")) {
-        return link.split("/jobs/")[1];
-      }
-      if (link.includes("njoftime.com")) {
-        return link.split("showthread.php?")[1];
-      }
-    };
-
-    let jobId = getJobId();
+    let jobId = getJobId(link);
     const checkBookmarkStatus = async () => {
       const job = await BookmarkedJob.find({ jobId, user: req.user._id });
 
@@ -386,19 +387,7 @@ exports.checkBookmarkStatus = async (req, res, next) => {
       });
     }
 
-    const getJobId = () => {
-      if (link.includes("njoftimefalas.com")) {
-        return link.split("oferta-njoftime-pune/")[1];
-      }
-      if (link.includes("duapune.com")) {
-        return link.split("/jobs/")[1];
-      }
-      if (link.includes("njoftime.com")) {
-        return link.split("showthread.php?")[1];
-      }
-    };
-
-    let jobId = getJobId();
+    let jobId = getJobId(link);
     const checkBookmarkStatus = async () => {
       const job = await BookmarkedJob.find({ jobId, user: req.user._id });
 
