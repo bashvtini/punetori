@@ -42,48 +42,93 @@ const cityCoverter = (enteredCity) => {
   return "";
 };
 
-module.exports = async (query, city = "") => {
+module.exports = async (query, city = "", days = 0) => {
   // Get Today's Job Offers from https://www.njoftimefalas.com/
   let page = 1;
   let switcher = true;
   const date = String(new Date().getDate()).padStart(2, "0");
 
+  // Get Month after - days
+  var d = new Date();
+  d.setDate(d.getDate() - days);
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+
   const jobs = [];
 
   while (switcher) {
+    const url = `https://www.njoftimefalas.com/name.php?name=ads_advertise&ads_advertise=njoftime&njoftime=ads_list&ads_city=${cityCoverter(
+      city
+    )}&idk=23&ads_keyword=${query}&page=${page}`;
     await axios
-      .post(
-        `https://www.njoftimefalas.com/name.php?name=ads_advertise&ads_advertise=njoftime&njoftime=ads_list&ads_city=${cityCoverter(
-          city
-        )}&idk=23&ads_keyword=${query}&page=${page}`
-      )
+      .post(url)
       .then((result) => {
         const $ = cheerio.load(result.data);
 
         page++;
 
         // Get Jobs
-        $(`.adds-wrapper .job-item`).each((index, element) => {
+        $(`.adds-wrapper > div.item-list.job-item`).each((index, element) => {
           const title = $(element).find(`.job-title a`).text();
           let link = $(element).find(`.job-title a`).attr("href");
           // const tag = $(element).find(`.save-job`).text().trim();
-          const time = $(element)
-            .find(`.list-inline li:last-child b`)
-            .text()
-            .trim()
-            .split("/")[0];
 
-          if (time === date) {
+          const jobDate = $(element)
+            .find(`.list-inline li:last-child .info-row b`)
+            .text()
+            .split("/");
+
+          const jobDay = jobDate[0];
+          const jobMonth = jobDate[1];
+
+          // fix the month
+
+          // month - the month of the filter
+          // day - the day of the filter
+          // jobMonth - current job month
+          // jobDay - current job day
+
+          if (month < jobMonth) {
+            // console.log(
+            //   `Filter Day: ${day}`,
+            //   `| Job Day: ${jobDay}`,
+            //   `| Filter Month: ${month}`,
+            //   `| Job Month: ${jobMonth}`
+            // );
             jobs.push({
               title,
               link,
               // tag,
               // time,
             });
-          } else {
-            switcher = false;
+            return;
+          }
+
+          if (month === jobMonth) {
+            if (day > jobDay) {
+              // console.log("false");
+              switcher = false;
+              return;
+            }
+
+            // console.log(
+            //   `Filter Day: ${day}`,
+            //   `| Job Day: ${jobDay}`,
+            //   `| Filter Month: ${month}`,
+            //   `| Job Month: ${jobMonth}`
+            // );
+
+            jobs.push({
+              title,
+              link,
+              // tag,
+              // time,
+            });
           }
         });
+      })
+      .catch((e) => {
+        console.log(e);
       });
   }
 

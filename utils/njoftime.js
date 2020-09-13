@@ -60,70 +60,86 @@ const typeConverter = (enteredType) => {
   return "0";
 };
 
-module.exports = async (query, city = "", type = 0) => {
+module.exports = async (query, city = "", type = 0, days = 1) => {
   // Get Today's Job Offers from http://www.njoftime.com/
-  // let totalPages = 2;
+  let totalPages = 2;
   let page = 1;
-  // const limit = 200;
-  const date = String(new Date().getDate()).padStart(2, "0");
+  const limit = 200;
+  // const date = String(new Date().getDate()).padStart(2, "0");
+  // const month = String(new Date().getMonth()).padStart(2, "0") + 1;
+  const selectedCity = city !== "" ? "&field3[0]=" + cityCoverter(city) : "";
+  const selectedJobType = type !== 0 ? "&field1[0]=" + typeConverter(type) : "";
 
   const jobs = [];
 
-  // while (totalPages >= page) {}
-  const url = `http://www.njoftime.com/forumdisplay.php?14-ofroj-vende-pune&s=&pp=200${
-    city !== "" ? "&field3[0]=" + cityCoverter(city) : ""
-  }${
-    type !== 0 ? "&field1[0]=" + typeConverter(type) : ""
-  }&field4_isMin=&field4_isMax=&input_titull=${query}&daysprune=1`;
+  while (totalPages >= page) {
+    const url = `http://www.njoftime.com/forumdisplay.php?14-ofroj-vende-pune&s=&pp=${limit}${selectedCity}${selectedJobType}&field4_isMin=&field4_isMax=&input_titull=${query}&daysprune=${days}`;
 
-  await axios
-    .get(url)
-    .then((result) => {
-      const $ = cheerio.load(result.data);
+    await axios
+      .get(url)
+      .then((result) => {
+        const $ = cheerio.load(result.data);
 
-      // page++;
-
-      // const paggination = $(`.pagination span a.popupctrl`).text();
-
-      // if (paggination.split("nga ") && totalPages === 2 && paggination !== "") {
-      //   totalPages = Number(paggination.split("nga")[2].trim());
-      // } else {
-      //   page = 5;
-      // }
-
-      // Get Jobs
-      $(`#threads .threadbit`).each((index, element) => {
-        const title = $(element).find(`.title`).text();
-        // .replace(/[^\w\s]/gi, "e");
-
-        let link = $(element).find(`.title`).attr("href");
-
-        if (link.split("&s=")) {
-          link = link.split("&s=")[0].split("-")[0];
+        // Check If any Jobs are avaliable
+        const availbaleJobs = $(".threadbit .nonthread").length;
+        if (availbaleJobs) {
+          page = 100;
+          return;
         }
 
-        // const employer = $(element)
-        //   .find(`.threadlastpostintitle a.username strong`)
-        //   .text();
-        const time = $(element)
-          .find(`.threadlastpostintitle dd:last-child`)
-          .text()
-          .trim()
-          .split(".")[0];
+        // Get Jobs
+        $(`#threads li.threadbit`).each((index, element) => {
+          const title = $(element).find(`.title`).text();
+          // .replace(/[^\w\s]/gi, "e");
 
-        if (time === date) {
+          let link = $(element).find(`.title`).attr("href");
+
+          if (link.split("&s=")) {
+            link = link.split("&s=")[0].split("-")[0];
+          }
+
+          // const employer = $(element)
+          //   .find(`.threadlastpostintitle a.username strong`)
+          //   .text();
+          // const time = $(element)
+          //   .find(`.threadlastpostintitle dd:last-child`)
+          //   .text()
+          //   .trim()
+          //   .split(".")[0];
+
+          // if (time === date) {
           jobs.push({
             title,
             link: "http://njoftime.com/" + link,
             // employer,
           });
+          // }
+        });
+
+        // Paggination check
+        const availablePaggination = $(".threadpagenav form").length;
+        if (availablePaggination) {
+          const paggination = $(`.pagination span a.popupctrl`).text();
+
+          if (
+            paggination.split("nga ") &&
+            totalPages === 2 &&
+            paggination !== ""
+          ) {
+            totalPages = Number(paggination.split("nga")[2].trim());
+          }
+
+          page++;
+        } else {
+          page = 100;
+          return;
         }
+      })
+      .catch((error) => {
+        page = 100;
+        return error;
       });
-    })
-    .catch((error) => {
-      page = 5;
-      return;
-    });
+  }
 
   return jobs;
 };
