@@ -4,21 +4,22 @@
 
 <p>The URL</p>
 
-<strong>GET</strong> <http://localhost:5000/search/:query?city=tirane&type=1>
+<strong>GET</strong> <http://localhost:5000/search/:query?city=tirane&type=1&jobDate=10>
 
 ### Query:
 
 <ol>
-<li>City: All Albanian Cities</li>
+<li>City: All Albanian Cities - Default = 0</li>
 <li>Type: 
     <ul>
-        <li>0 - All Types</li>
+        <li>0 - All Types - Defualt</li>
         <li>1 - Full Time</li>
         <li>2 - Part Time</li>
         <li>3 - Intership</li>
     </ul>
 
 </li>
+<li>JobDate: Date Posted - Default = 1</li>
 </ol>
 
 #### Response

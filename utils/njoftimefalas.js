@@ -47,7 +47,7 @@ module.exports = async (query, city = "", days = 0) => {
 
   let page = 1;
   let switcher = true;
-  const date = String(new Date().getDate()).padStart(2, "0");
+  // const date = String(new Date().getDate()).padStart(2, "0");
 
   // Get Month after - days
   var d = new Date();
