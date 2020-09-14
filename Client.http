@@ -8,7 +8,7 @@
 
 
 ### Search Jobs
-GET {{url}}/search/frontend?city=tirane&type=2 HTTP/1.1
+GET {{url}}/search/frontend?city=tirane&type=2&jobDate=20 HTTP/1.1
 
 
 ### Register User

@@ -44,6 +44,7 @@ const cityCoverter = (enteredCity) => {
 
 module.exports = async (query, city = "", days = 0) => {
   // Get Today's Job Offers from https://www.njoftimefalas.com/
+
   let page = 1;
   let switcher = true;
   const date = String(new Date().getDate()).padStart(2, "0");
@@ -60,12 +61,15 @@ module.exports = async (query, city = "", days = 0) => {
     const url = `https://www.njoftimefalas.com/name.php?name=ads_advertise&ads_advertise=njoftime&njoftime=ads_list&ads_city=${cityCoverter(
       city
     )}&idk=23&ads_keyword=${query}&page=${page}`;
+
     await axios
       .post(url)
       .then((result) => {
         const $ = cheerio.load(result.data);
 
         page++;
+
+        let jobsWereFound = false;
 
         // Get Jobs
         $(`.adds-wrapper > div.item-list.job-item`).each((index, element) => {
@@ -81,8 +85,6 @@ module.exports = async (query, city = "", days = 0) => {
           const jobDay = jobDate[0];
           const jobMonth = jobDate[1];
 
-          // fix the month
-
           // month - the month of the filter
           // day - the day of the filter
           // jobMonth - current job month
@@ -95,6 +97,8 @@ module.exports = async (query, city = "", days = 0) => {
             //   `| Filter Month: ${month}`,
             //   `| Job Month: ${jobMonth}`
             // );
+
+            jobsWereFound = true;
             jobs.push({
               title,
               link,
@@ -117,7 +121,7 @@ module.exports = async (query, city = "", days = 0) => {
             //   `| Filter Month: ${month}`,
             //   `| Job Month: ${jobMonth}`
             // );
-
+            jobsWereFound = true;
             jobs.push({
               title,
               link,
@@ -126,6 +130,10 @@ module.exports = async (query, city = "", days = 0) => {
             });
           }
         });
+
+        if (!jobsWereFound) {
+          switcher = false;
+        }
       })
       .catch((e) => {
         console.log(e);
