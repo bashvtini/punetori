@@ -21,7 +21,7 @@ const typeConverter = (enteredType) => {
   return "";
 };
 
-module.exports = async (query, type = "", days = 0) => {
+module.exports = async (query, type = "") => {
   // Get Today's Job Offers from https://duapune.com/
   const jobs = [];
   // let lastPage = 0;
@@ -64,21 +64,21 @@ module.exports = async (query, type = "", days = 0) => {
 
         // const tag = $(element).find(`.main-jobs-tag a`).text();
 
-        if (days === 0) {
-          if ($(element).find(`.tagIt`).text().trim() === "e re") {
-            jobs.push({
-              title,
-              link,
-              // employer,
-              // tag,
-            });
-          }
-        } else {
-          jobs.push({
-            title,
-            link,
-          });
-        }
+        // if (days === 0) {
+        //   if ($(element).find(`.tagIt`).text().trim() === "e re") {
+        //     jobs.push({
+        //       title,
+        //       link,
+        //       // employer,
+        //       // tag,
+        //     });
+        //   }
+        // }
+
+        jobs.push({
+          title,
+          link,
+        });
       });
     });
 

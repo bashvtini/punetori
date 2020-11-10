@@ -72,7 +72,11 @@ module.exports = async (query, city = "", days = 0) => {
         let jobsWereFound = false;
 
         // Get Jobs
-        $(`.adds-wrapper > div.item-list.job-item`).each((index, element) => {
+        $(`.adds-wrapper > div.item-list`).each((index, element) => {
+          if ($(element).children().length === 1) {
+            return;
+          }
+
           const title = $(element).find(`.job-title a`).text();
           let link = $(element).find(`.job-title a`).attr("href");
           // const tag = $(element).find(`.save-job`).text().trim();
@@ -89,24 +93,6 @@ module.exports = async (query, city = "", days = 0) => {
           // day - the day of the filter
           // jobMonth - current job month
           // jobDay - current job day
-
-          if (month < jobMonth) {
-            // console.log(
-            //   `Filter Day: ${day}`,
-            //   `| Job Day: ${jobDay}`,
-            //   `| Filter Month: ${month}`,
-            //   `| Job Month: ${jobMonth}`
-            // );
-
-            jobsWereFound = true;
-            jobs.push({
-              title,
-              link,
-              // tag,
-              // time,
-            });
-            return;
-          }
 
           if (month === jobMonth) {
             if (day > jobDay) {
@@ -128,6 +114,27 @@ module.exports = async (query, city = "", days = 0) => {
               // tag,
               // time,
             });
+            return;
+          }
+
+          if (month < jobMonth) {
+            // console.log(
+            //   `Filter Day: ${day}`,
+            //   `| Job Day: ${jobDay}`,
+            //   `| Filter Month: ${month}`,
+            //   `| Job Month: ${jobMonth}`
+            // );
+
+            jobsWereFound = true;
+            jobs.push({
+              title,
+              link,
+              // tag,
+              // time,
+            });
+            return;
+          } else {
+            switcher = false;
           }
         });
 
